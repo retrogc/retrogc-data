@@ -1,0 +1,73 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Retroarch version (e.g. 1.22.2)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Validate version
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version: ${{ inputs.version }}"
+            echo "Version must be in the form X.Y.Z (for example 1.22.2)"
+            exit 1
+          fi
+
+      - name: Install build deps
+        run: |
+          sudo apt update && sudo apt install -y 7zip
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Create linux retroarch v${{ inputs.version }} archive
+        run: |
+          echo "==> Downloading RetroArch ${{ inputs.version }}..."
+          wget https://buildbot.libretro.com/stable/${{ inputs.version }}/linux/x86_64/RetroArch.7z
+          wget https://buildbot.libretro.com/stable/${{ inputs.version }}/linux/x86_64/RetroArch_cores.7z
+          echo "<== Download completed."
+          echo "==> Extracting RetroArch ${{ inputs.version }}..."
+          7z x RetroArch.7z -y -bd -bb0 && rm RetroArch.7z
+          7z x RetroArch_cores.7z -y -bd -bb0 && rm RetroArch_cores.7z
+          echo "<== Extraction completed."
+          echo "==> Creating linux package..."
+          cd RetroArch-Linux-x86_64
+          zip -qr ../retrogc-data-${{ inputs.version }}-linux.zip .
+          echo "<== Linux package created."
+
+      - name: Create windows retroarch v${{ inputs.version }} archive
+        run: |
+          echo "==> Downloading RetroArch ${{ inputs.version }}..."
+          wget https://buildbot.libretro.com/stable/${{ inputs.version }}/windows/x86_64/RetroArch.7z
+          wget https://buildbot.libretro.com/stable/${{ inputs.version }}/windows/x86_64/RetroArch_cores.7z
+          echo "<== Download completed."
+          echo "==> Extracting RetroArch ${{ inputs.version }}..."
+          7z x RetroArch.7z -y -bd -bb0 && rm RetroArch.7z
+          7z x RetroArch_cores.7z -y -bd -bb0 && rm RetroArch_cores.7z
+          echo "<== Extraction completed."
+          echo "==> Creating windows package..."
+          cd RetroArch-Win64
+          zip -qr ../retrogc-data-${{ inputs.version }}-windows.zip .
+          echo "<== Windows package created."
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: retrogc-data v${{ inputs.version }}
+          generate_release_notes: true
+          files: |
+            retrogc-data-${{ inputs.version }}-linux.zip
+            retrogc-data-${{ inputs.version }}-windows.zip
