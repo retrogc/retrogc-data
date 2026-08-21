@@ -1,17 +1,26 @@
 {
-  "version": "1.22.2",
-  "platforms": {
-    "win-x64": {
-      "retrogc-data": {
-        "file": "retrogc-data-1.22.2-windows.zip",
-        "url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch.7z"
-      }
-    },
-    "linux-x64": {
-      "retrogc-data": {
-        "file": "retrogc-data-1.22.2-linux.zip",
-        "url": "https://buildbot.libretro.com/stable/1.22.2/linux/x86_64/RetroArch.7z"
+  "default": "1.22.2",
+  "versions": [
+    {
+      "version": "1.22.2",
+      "platforms": {
+        "win-x64": {
+          "data": [
+            {
+              "file": "retrogc-data-1.22.2-windows.zip",
+              "url": "https://github.com/retrogc/retrogc-data/releases/download/1.22.2/retrogc-data-1.22.2-windows.zip"
+            }
+          ]
+        },
+        "linux-x64": {
+          "data": [
+            {
+              "file": "retrogc-data-1.22.2-linux.zip",
+              "url": "https://github.com/retrogc/retrogc-data/releases/download/1.22.2/retrogc-data-1.22.2-linux.zip"
+            }
+          ]
+        }
       }
     }
-  }
+  ]
 }
